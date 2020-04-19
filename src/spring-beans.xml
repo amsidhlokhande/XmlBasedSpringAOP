@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+	<bean id="person" class="com.amsidh.mvc.domain.Person">
+		<property name="personId" value="123" />
+		<property name="personName" value="Amsidh Lokhande" />
+	</bean>
+
+	<bean id="person2" class="com.amsidh.mvc.domain.Person">
+		<constructor-arg name="personId" value="321" />
+		<constructor-arg name="personName" value="Anjali lokhande" />
+	</bean>
+
+
+	<!-- AOP Configuration -->
+	<bean id="loggingAspect" class="com.amsidh.mvc.aspect.LoggingAspect" />
+	<aop:aspectj-autoproxy />
+
+	<aop:config>
+       <!-- define pointcuts -->
+       <aop:pointcut expression="execution(* com.amsidh.mvc.domain.Person.get*())" id="executionPointcut"/>
+       <aop:pointcut expression="within(com.amsidh.mvc.domain.*)" id="withinPointcut"/>
+       <aop:pointcut expression="args(str)" id="argsPointcut"/>
+       <aop:pointcut expression="@annotation(com.amsidh.mvc.annotation.Loggable)" id="annotationPointcut"/>
+       
+       <aop:aspect id="firstAspect" ref="loggingAspect">
+          <aop:before method="beforeMethodAdvice" pointcut-ref="executionPointcut"/>
+          <aop:after method="methodWhichTakeStringAsArgs" pointcut-ref="argsPointcut" arg-names="str"/>
+       </aop:aspect>
+       
+       <aop:aspect id="secondAspect" ref="loggingAspect">
+          <aop:after-returning method="afterReturningAdvice" pointcut-ref="annotationPointcut" returning="result"/>
+          <aop:after-throwing method="afterThrowAdvice" pointcut-ref="withinPointcut" throwing="ex"/>
+       </aop:aspect>
+       
+       
+	</aop:config>
+
+</beans>
